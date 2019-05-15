@@ -1,0 +1,28 @@
+{
+    "name": "tobybatch/kimai-chrome-ext",
+    "description": "A Kimai 2 plugin which allows time entries directly from trello issues",
+    "homepage": "https://www.neontribe.co.uk",
+    "type": "kimai-plugin",
+    "require": {
+        "kimai/kimai2-composer": "*"
+    },
+    "keywords": [
+        "kimai",
+        "kimai-plugin"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Toby Batch",
+            "email": "tobias@neontribe.co.uk",
+            "homepage": "https://www.neontribe.co.uk"
+        }
+    ],
+    "extra": {
+        "kimai": {
+            "require": "0.9",
+            "version": "0.1",
+            "name": "ChromeExt"
+        }
+    }
+}
