@@ -14,3 +14,10 @@ services:
     KimaiPlugin\ChromeExtBundle\Controller\:
         resource: '../../Controller'
         tags: ['controller.service_arguments']
+        public: true
+                
+    KimaiPlugin\ChromeExtBundle\Repository\ExtProjectRepository:
+        class:     Doctrine\ORM\EntityRepository
+        factory:   ['@doctrine.orm.entity_manager', getRepository]
+        arguments: ['KimaiPlugin\ChromeExtBundle\Entity\ExtProject']
+        
