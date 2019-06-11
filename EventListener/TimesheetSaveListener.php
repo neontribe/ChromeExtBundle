@@ -1,15 +1,14 @@
 <?php
 namespace KimaiPlugin\ChromeExtBundle\EventListener;
 
+use App\Entity\Timesheet;
+use App\Timesheet\CalculatorInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
-class TimesheetSaveListener implements EventSubscriberInterface {
+class TimesheetSaveListener  implements CalculatorInterface {
 
   /**
    *
@@ -39,17 +38,12 @@ class TimesheetSaveListener implements EventSubscriberInterface {
     $this->session = $session;
   }
 
-  public static function getSubscribedEvents() {
-    return [
-      KernelEvents::RESPONSE => [
-        [
-          'processResponse',
-          10
-        ]
-      ]
-    ];
+  public function calculate(Timesheet $record)
+  {
+      // Move logic here
   }
 
+  /*
   public function processResponse(FilterResponseEvent $event) {
     $kernel = $event->getKernel();
     $request = $event->getRequest();
@@ -83,4 +77,5 @@ class TimesheetSaveListener implements EventSubscriberInterface {
       }
     }
   }
+  */
 }

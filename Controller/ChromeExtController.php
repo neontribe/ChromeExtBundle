@@ -18,7 +18,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
  *
  * @Route(path="/chrome-ext")
  */
-class ChromeExtController extends AbstractController implements CalculatorInterface {
+class ChromeExtController extends AbstractController {
 
   /**
    * Returns a list of projects.
@@ -218,10 +218,5 @@ class ChromeExtController extends AbstractController implements CalculatorInterf
       'issue' => $issue
     ]);
   }
-
-public function calculate(Timesheet $record)
-    {
-    error_log("HERE£");
-}
 
 }
