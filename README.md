@@ -1,2 +1,1 @@
-    php bin/console make:migration
-    php bin/console doctrine:migrations:migrate
+Point the chrome unpoacked extension at ```chrome-extension/```

@@ -1,22 +1,14 @@
-<!DOCTYPE html>
-<head>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://getbootstrap.com/docs/4.3/examples/floating-labels/floating-labels.css">
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-</head>
-</head>
-<body>
+{% extends 'base.html.twig' %}
 
-<div class="container">
 {% block main %}
 {%  if not kimai_project %}
     <div>
-        There is no kimai project associated with the project UUID {{ projectUuid }}.
+        There is no kimai project associated with the project UUID <code>{{ projectUuid }}</code>.
         Select a kimai project to associated it with.
     </div>
 {% else %}
     <div>
-        Change the kimai priject associated with the UUID {{ projectUuid }}.
+        Change the kimai project associated with the UUID <code>{{ projectUuid }}</code>.
     </div>
 {%  endif %}
 <div>
@@ -31,6 +23,3 @@
 {%  endif %}
 
 {% endblock %}
-</div>
-</body>
-</html>

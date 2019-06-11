@@ -1,6 +1,6 @@
 {
     "name": "tobybatch/kimai-chrome-ext",
-    "description": "A Kimai 2 plugin which allows time entries directly from trello issues",
+    "description": "A Kimai 2 plugin which allows time entries directly from trello/github issues",
     "homepage": "https://www.neontribe.co.uk",
     "type": "kimai-plugin",
     "require": {

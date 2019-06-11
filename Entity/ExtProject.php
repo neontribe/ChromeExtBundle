@@ -29,7 +29,7 @@ class ExtProject {
 
   /**
    *
-   * @var Issues[]
+   * @var ExtIssue[]
    *
    * @ORM\OneToMany(targetEntity="KimaiPlugin\ChromeExtBundle\Entity\ExtIssue", mappedBy="project")
    */
@@ -70,7 +70,7 @@ class ExtProject {
    * @return ExtIssue[]
    */
   public function getIssues() {
-    return $this->$issues;
+    return $this->issues;
   }
 
   /**

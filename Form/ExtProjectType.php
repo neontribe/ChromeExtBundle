@@ -34,7 +34,10 @@ class ExtProjectType extends AbstractType {
 
     $label = $kimaiProject ? 'Update' : 'Create';
     $builder->add('project', ChoiceType::class, $options)->add('save', SubmitType::class, [
-      'label' => $label
+      'label' => $label,
+      'attr' => [
+        'class' => 'btn-primary btn'
+      ]
     ]);
   }
 

@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+{% if timesheets | length %}
+  {% for timesheet in timesheets %}
+      <div class="container" title="{{ timesheet.getDescription }}">
+        {{ timesheet.getBegin|date("Y/m/d") }},
+        {{ timesheet.getDuration|date('H:i', '+00:00 GMT') }} (H:M),
+        {{ timesheet.getActivity.getName }}
+        <a href="{{ path('chrome_ext_list', {project: project, issue: issue, timesheet_id: timesheet.getId }) }}">e</a>
+        <a href="{{ path('chrome_ext_list', {project: project, issue: issue, timesheet_id: timesheet.getId }) }}">x</a>
+      </div>
+  {% endfor %}
+{% else %}
+    <div class="container">
+      No time is logged for this issue.
+    </div>
+{% endif %}
+  
+<div class="container">
+    <a href="{{ path('timesheet_create', { begin: "now"|date("Y-M-D"), "project": projectId }) }}">Log new time</a>
+</div>
+{% endblock %}
