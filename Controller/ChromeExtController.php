@@ -16,6 +16,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
  *
+ * @Security("is_granted('view_own_timesheet')")
  * @Route(path="/chrome-ext")
  */
 class ChromeExtController extends AbstractController
@@ -159,6 +160,7 @@ class ChromeExtController extends AbstractController
     /**
      *
      * @Route(path="/{project}/{issue}/project", name="chrome_ext_edit_project", methods={"GET", "POST"})
+     * @Security("is_granted('edit', project)")
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
@@ -216,6 +218,7 @@ class ChromeExtController extends AbstractController
     /**
      *
      * @Route(path="/{timesheet}/{issue}/delete", name="chrome_ext_delete")
+     * @Security("is_granted('delete_other_timesheet')")
      *
      * @param Request $request
      * @param Timesheet $timesheet
@@ -234,6 +237,7 @@ class ChromeExtController extends AbstractController
     /**
      *
      * @Route(path="/{timesheet}/{extIssue}/delete/impl", name="chrome_ext_delete_impl")
+     * @Security("is_granted('delete_other_timesheet')")
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
