@@ -1,6 +1,9 @@
-{% extends 'base.html.twig' %}
+{% extends '@ChromeExt/base.html.twig' %}
+
+{% block page_title %}Associate Project{% endblock %}
 
 {% block main %}
+<div class='container'>
 {%  if not kimai_project %}
     <div>
         There is no kimai project associated with the project UUID <code>{{ projectUuid }}</code>.
@@ -21,5 +24,5 @@
         If you are the project lead you may need to log into the full kimai UI and create the project.
     </div>
 {%  endif %}
-
+</div>
 {% endblock %}

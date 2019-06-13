@@ -18,205 +18,251 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
  *
  * @Route(path="/chrome-ext")
  */
-class ChromeExtController extends AbstractController {
+class ChromeExtController extends AbstractController
+{
 
-  /**
-   * Returns a list of projects.
-   *
-   * @Route(path="/", name="chrome_ext_index")
-   *
-   * @param Request $request
-   * @return \Symfony\Component\HttpFoundation\Response
-   */
-  public function indexAction(Request $request) {
-    $entityManager = $this->getDoctrine()->getManager();
-    $projectRepo = $entityManager->getRepository(Project::class);
+    /**
+     * Returns a list of projects.
+     *
+     * @Route(path="/", name="chrome_ext_index")
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function indexAction(Request $request)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $projectRepo = $entityManager->getRepository(Project::class);
 
-    $projects = $projectRepo->findAll();
+        $projects = $projectRepo->findAll();
 
-    $_customers = [];
-    $_projects = [];
+        $_customers = [];
+        $_projects = [];
 
-    foreach ($projects as $project) {
-      $customer = $project->getCustomer();
-      $customerName = $customer->getName();
-      if (! array_key_exists($customerName, $_customers)) {
-        $_customers[$customerName] = $customer;
-        $_projects[$customerName] = [];
-      }
-      $_projects[$customerName][] = $project;
+        foreach ($projects as $project) {
+            $customer = $project->getCustomer();
+            $customerName = $customer->getName();
+            if (! array_key_exists($customerName, $_customers)) {
+                $_customers[$customerName] = $customer;
+                $_projects[$customerName] = [];
+            }
+            $_projects[$customerName][] = $project;
+        }
+
+        return $this->render('@ChromeExt/index.html.twig', [
+            'customers' => $_customers,
+            'projects' => $_projects
+        ]);
     }
 
-    return $this->render('@ChromeExt/index.html.twig', [
-      'customers' => $_customers,
-      'projects' => $_projects
-    ]);
-  }
+    /**
+     * Returns a list of issues in a project.
+     *
+     * @Route(path="/{project}", name="chrome_ext_project")
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function projectAction(Project $project, Request $request)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $kimaiprojectRepo = $entityManager->getRepository(Project::class);
+        $projectRepo = $entityManager->getRepository(ExtProject::class);
 
-  /**
-   * Returns a list of issues in a project.
-   *
-   * @Route(path="/{projectId}", name="chrome_ext_project")
-   *
-   * @param Request $request
-   * @return \Symfony\Component\HttpFoundation\Response
-   */
-  public function projectAction(Request $request, $projectId) {
-    $entityManager = $this->getDoctrine()->getManager();
-    $kimaiprojectRepo = $entityManager->getRepository(Project::class);
-    $projectRepo = $entityManager->getRepository(ExtProject::class);
-    $issueRepo = $entityManager->getRepository(ExtIssue::class);
+        // Get the kimai project bu id
+        $project = $kimaiprojectRepo->find($projectId);
 
-    // Get the kimai project bu id
-    $kimiaProject = $kimaiprojectRepo->find($projectId);
+        // project param is a uuid, look up the kimai project
+        /**
+         *
+         * @var ExtProject $extProject
+         */
+        $extProject = $projectRepo->findOneBy([
+            'project' => $project
+        ]);
 
-    // project param is a uuid, look up the kimai project
+        $issues = [];
+        if ($extProject) {
+            $issues = $extProject->getIssues();
+        }
+
+        return $this->render('@ChromeExt/issues.html.twig', [
+            'project' => $project,
+            'extproject' => $extProject,
+            'issues' => $issues
+        ]);
+    }
+
+    /**
+     * This is the desired entry point for the iframe.
+     *
+     * @Route(path="/{projectUuid}/{issueUuid}", name="chrome_ext_list")
+     *
+     * @param string $projectUuid
+     *            The unique identifier for the project from the ticket or issue.
+     * @param string $issueUuid
+     *            The unique identifier for the issue from the ticket or issue.
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function listAction($projectUuid, $issueUuid, Request $request)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $projectRepo = $entityManager->getRepository(ExtProject::class);
+        $issueRepo = $entityManager->getRepository(ExtIssue::class);
+
+        /*
+         * The project param is a uuid, look up the real kimai project
+         * @var ExtProject
+         */
+        $extProject = $projectRepo->findOneBy([
+            'uuid' => $projectUuid
+        ]);
+
+        if (! $extProject) {
+            // If there is no project then redirect to project association.
+            return $this->redirectToRoute('chrome_ext_edit_project', [
+                'project' => $projectUuid,
+                'issue' => $issueUuid
+            ]);
+        }
+
+        /*
+         * Load the issue bridge entity identified by that UUID, this will have alist of timesheets associated with it.
+         *
+         * var KimaiPlugin\ChromeExtBundle\Entity\ExtIssue
+         */
+        $extIssue = $issueRepo->findOneBy([
+            'uuid' => $issueUuid
+        ]);
+        if ($extIssue) {
+            // Fetch all timesheets associated with this issue.
+            $timesheets = $extIssue->getTimesheets();
+        } else {
+            // No issue, create a new issue bridge
+            $extIssue = new ExtIssue();
+            $extIssue->setUuid($issueUuid);
+            $extIssue->setProject($extProject);
+            $entityManager->persist($extIssue);
+            $entityManager->flush();
+            $timesheets = [];
+        }
+
+        return $this->render('@ChromeExt/list.html.twig', [
+            'extProject' => $extProject,
+            'extIssue' => $extIssue,
+            'timesheets' => $timesheets
+        ]);
+    }
+
     /**
      *
-     * @var ExtProject $extProject
+     * @Route(path="/{project}/{issue}/project", name="chrome_ext_edit_project", methods={"GET", "POST"})
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    $extProject = $projectRepo->findOneBy([
-      'project' => $kimiaProject
-    ]);
+    public function projectEditAction(Request $request, $project, $issue)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $repo = $entityManager->getRepository(ExtProject::class);
 
-    $issues = [];
-    if ($extProject) {
-        $issues = $extProject->getIssues();
+        // project param is a uuid, look up the kimai project
+        /**
+         *
+         * @var KimaiPlugin\ChromeExtBundle\Entity\ExtProject
+         */
+        $kimaiProject = $repo->findOneBy([
+            'uuid' => $project
+        ]);
+
+        $form = $this->createForm(ExtProjectType::class, null, [
+            'kimai_project' => $kimaiProject,
+            'project_repo' => $this->getDoctrine()
+                ->getManager()
+                ->getRepository(Project::class)
+        ]);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // $form->getData() holds the submitted values
+            // but, the original `$task` variable has also been updated
+            $task = $form->getData();
+            $_project = $task['project'];
+
+            if (! $kimaiProject) {
+                $kimaiProject = new ExtProject();
+                $kimaiProject->setUuid($project);
+            }
+            $kimaiProject->setProject($_project);
+
+            $entityManager->persist($kimaiProject);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('chrome_ext_list', [
+                'projectUuid' => $kimaiProject->getUuid(),
+                'issueUuid' => $issue
+            ]);
+        }
+
+        return $this->render('@ChromeExt/project.html.twig', [
+            'projectUuid' => $project,
+            'kimai_project' => $kimaiProject,
+            'form' => $form->createView()
+        ]);
     }
 
-    return $this->render('@ChromeExt/issues.html.twig', [
-      'project' => $kimiaProject,
-      'extproject' => $extProject,
-      'issues' => $issues,
-    ]);
-  }
-
-  /**
-   *
-   * @Route(path="/{project}/{issue}", name="chrome_ext_list")
-   *
-   * @param Request $request
-   * @return \Symfony\Component\HttpFoundation\Response
-   */
-  public function listAction(Request $request, $project, $issue) {
-    $entityManager = $this->getDoctrine()->getManager();
-    $projectRepo = $entityManager->getRepository(ExtProject::class);
-    $issueRepo = $entityManager->getRepository(ExtIssue::class);
-
-    /*
-     * project param is a uuid, look up the kimai project
-     * @var ExtProject
-     */
-    $extProject = $projectRepo->findOneBy([
-      'uuid' => $project
-    ]);
-
-    if (! $extProject) {
-      // if there is no project then redirect to project association.
-      return $this->redirectToRoute('chrome_ext_edit_project', [
-        'project' => $project,
-        'issue' => $issue
-      ]);
-    }
-
-    // Now fetch all timesheets for the issue
-    /*
-     * var KimaiPlugin\ChromeExtBundle\Entity\ExtIssue
-     */
-    $extIssue = $issueRepo->findOneBy([
-      'uuid' => $issue
-    ]);
-    if ($extIssue) {
-      $timesheets = $extIssue->getTimesheets();
-    } else {
-      // Create the new ext issue
-      $extIssue = new ExtIssue();
-      $extIssue->setUuid($issue);
-      $extIssue->setProject($extProject);
-      $entityManager->persist($extIssue);
-      $timesheets = [];
-    }
-
-    foreach ($timesheets as $timesheet) {
-      error_log($timesheet->getDescription());
-    }
-    return $this->render('@ChromeExt/list.html.twig', [
-      'project' => $project,
-      'projectId' => $extProject->getProject()
-        ->getId(),
-      'issue' => $issue,
-      'timesheets' => $timesheets
-    ]);
-  }
-
-  /**
-   *
-   * @Route(path="/{project}/{issue}/project", name="chrome_ext_edit_project", methods={"GET", "POST"})
-   *
-   * @param Request $request
-   * @return \Symfony\Component\HttpFoundation\Response
-   */
-  public function projectEditAction(Request $request, $project, $issue) {
-    $entityManager = $this->getDoctrine()->getManager();
-    $repo = $entityManager->getRepository(ExtProject::class);
-
-    // project param is a uuid, look up the kimai project
     /**
      *
-     * @var KimaiPlugin\ChromeExtBundle\Entity\ExtProject
+     * @Route(path="/{timesheet}/{issue}/delete", name="chrome_ext_delete")
+     *
+     * @param Request $request
+     * @param Timesheet $timesheet
+     * @param ExtIssue $issue
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    $kimaiProject = $repo->findOneBy([
-      'uuid' => $project
-    ]);
-
-    $form = $this->createForm(ExtProjectType::class, null, [
-      'kimai_project' => $kimaiProject,
-      'project_repo' => $this->getDoctrine()
-        ->getManager()
-        ->getRepository(Project::class)
-    ]);
-
-    $form->handleRequest($request);
-    if ($form->isSubmitted() && $form->isValid()) {
-      // $form->getData() holds the submitted values
-      // but, the original `$task` variable has also been updated
-      $task = $form->getData();
-      $_project = $task['project'];
-
-      if (! $kimaiProject) {
-        $kimaiProject = new ExtProject();
-        $kimaiProject->setUuid($project);
-      }
-      $kimaiProject->setProject($_project);
-
-      $entityManager->persist($kimaiProject);
-      $entityManager->flush();
-
-      return $this->redirectToRoute('chrome_ext_list', [
-        'project' => $kimaiProject->getUuid(),
-        'issue' => $issue
-      ]);
+    public function deleteAction(Timesheet $timesheet, ExtIssue $issue, Request $request)
+    {
+        return $this->render('@ChromeExt/delete.html.twig', [
+            'timesheet' => $timesheet,
+            'project' => $issue->getProject(),
+            'issue' => $issue
+        ]);
     }
 
-    return $this->render('@ChromeExt/project.html.twig', [
-      'projectUuid' => $project,
-      'kimai_project' => $kimaiProject,
-      'form' => $form->createView()
-    ]);
-  }
+    /**
+     *
+     * @Route(path="/{timesheet}/{extIssue}/delete/impl", name="chrome_ext_delete_impl")
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function deleteImplAction(Timesheet $timesheet, ExtIssue $extIssue, Request $request)
+    {
+        if (! $extIssue) {
+            throw $this->createNotFoundException('Issue not found');
+        }
+        if (! $timesheet) {
+            throw $this->createNotFoundException('Timesheet not found');
+        }
 
-  /**
-   *
-   * @Route(path="/{project}/{issue}/{id}", name="chrome_ext_delete", methods={"DELETE"})
-   *
-   * @param Request $request
-   * @return \Symfony\Component\HttpFoundation\Response
-   */
-  public function deleteAction(Request $request, $project, $issue, $id) {
-    return $this->render('@ChromeExt/list.html.twig', [
-      'project' => $project,
-      'issue' => $issue
-    ]);
-  }
+        $checked = $request->query->get('checked');
+
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $extIssue->removeTimesheet($timesheet);
+        $entityManager->persist($extIssue);
+        $entityManager->flush();
+
+        // Can't cascade as we don't own the timesheet object.
+        $entityManager->remove($timesheet);
+        $entityManager->flush();
+
+        return $this->redirectToRoute("chrome_ext_list",[
+            "projectUuid" => $extIssue->getProject()->getUuid(),
+            "issueUuid" => $extIssue->getUuid()
+        ]);
+    }
 
 }

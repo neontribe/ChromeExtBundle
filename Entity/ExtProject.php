@@ -70,17 +70,32 @@ class ExtProject {
    * @return ExtIssue[]
    */
   public function getIssues() {
-    return $this->issues;
+      return $this->issues;
   }
 
   /**
-   *
-   * @param ExtIssue[] $activities
-   * @return ExtProject
+   * @param ExtIssue $extIssue
    */
-  public function setActivities($issues): self {
-    $this->issues = $issues;
+  public function addIssue(ExtIssue $extIssue)
+  {
+      if ($this->issues->contains($extIssue)) {
+          return;
+      }
 
-    return $this;
+      $this->issues->add($extIssue);
+      $extIssue->setProject($this);
   }
+
+  /**
+   * @param ExtIssue $timesheet
+   */
+  public function removeIssue(ExtIssue $extIssue)
+  {
+      if (!$this->issues->contains($extIssue)) {
+          return;
+      }
+
+      $this->issues->removeElement($extIssue);
+  }
+
 }

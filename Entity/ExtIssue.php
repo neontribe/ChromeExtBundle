@@ -78,20 +78,36 @@ class ExtIssue {
     return $this->timesheets;
   }
 
-  /**
-   *
-   * @param \App\Entity\Timesheet[] $timesheets
-   * @return ExtIssue
-   */
-  public function setTimesheets($timesheets): self {
-    $this->timesheets = $timesheets;
 
-    return $this;
+  /**
+   * @param ExtIssue $extIssue
+   */
+  public function addTimesheet(Timesheet $timesheet)
+  {
+      if ($this->timesheets->contains($timesheet)) {
+          return;
+      }
+
+      $this->timesheets->add($timesheet);
   }
 
-  public function addTimesheet(Timesheet $timesheet): self {
-    $this->timesheets[] = $timesheet;
+  /**
+   * @param ExtIssue $timesheet
+   */
+  public function removeTimesheet(Timesheet $timesheet)
+  {
+      if (!$this->timesheets->contains($timesheet)) {
+          return;
+      }
 
-    return $this;
+      $this->timesheets->removeElement($timesheet);
+  }
+
+  /**
+   * @return string
+   */
+  public function __toString()
+  {
+      return "ExtIssue " . $this->getUuid() . " part of ExtProject " . $this->getProject()->getId();
   }
 }
