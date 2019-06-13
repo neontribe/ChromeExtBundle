@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "Neontribe Timesheet Bridge",
-  "description": "Allow access to the Neontribe timesheet server",
+  "name": "Kimai Timesheet Bridge",
+  "description": "Allow access to a Kimai timesheet server",
   "homepage_url": "https://www.neontribe.co.uk",
   "version": "0.0.1",
   "background": {

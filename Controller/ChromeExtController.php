@@ -26,6 +26,7 @@ class ChromeExtController extends AbstractController
      * Returns a list of projects.
      *
      * @Route(path="/", name="chrome_ext_index")
+     * @Security("is_granted('create_own_timesheet')")
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
@@ -60,6 +61,7 @@ class ChromeExtController extends AbstractController
      * Returns a list of issues in a project.
      *
      * @Route(path="/{project}", name="chrome_ext_project")
+     * @Security("is_granted('create_own_timesheet')")
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
@@ -96,6 +98,7 @@ class ChromeExtController extends AbstractController
 
     /**
      * This is the desired entry point for the iframe.
+     * @Security("is_granted('create_own_timesheet')")
      *
      * @Route(path="/{projectUuid}/{issueUuid}", name="chrome_ext_list")
      *
@@ -160,7 +163,7 @@ class ChromeExtController extends AbstractController
     /**
      *
      * @Route(path="/{project}/{issue}/project", name="chrome_ext_edit_project", methods={"GET", "POST"})
-     * @Security("is_granted('edit', project)")
+     * @Security("is_granted('create_own_timesheet')")
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
