@@ -1,1 +1,5 @@
-Example code for my article on building a simple Google Chrome extension.
+## Kimai Timesheet Bridge
+
+https://www.neontribe.co.uk, version 0.0.1
+
+This extension allows time to be logged directly from github to a kimai server.  You will need an working install of kimai (https://www.kimai.org/) to connect to.
