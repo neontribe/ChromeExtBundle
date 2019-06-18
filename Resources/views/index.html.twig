@@ -4,10 +4,10 @@
 {% for customerName, customer in customers %}
   <div class="container" title="{{ customerName }}">
     <ul>
-      <li>{{ customerName }}</li>
+      <li class='customername'>{{ customerName }} </li>
       <ul>
       {%  for project in projects[customerName] %}
-        <li><a href="{{ path('chrome_ext_project', {projectId: project.getId}) }}">{{ project.name  }}</a></li>
+        <li class='project'><a href="{{ path('chrome_ext_project', {project: project.getId}) }}">{{ project.name  }}</a></li>
       {% endfor %}
       </ul>
       </div>
