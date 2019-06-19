@@ -69,11 +69,7 @@ class ChromeExtController extends AbstractController
     public function projectAction(Project $project, Request $request)
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $kimaiprojectRepo = $entityManager->getRepository(Project::class);
         $projectRepo = $entityManager->getRepository(ExtProject::class);
-
-        // Get the kimai project bu id
-        $project = $kimaiprojectRepo->find($projectId);
 
         // project param is a uuid, look up the kimai project
         /**
