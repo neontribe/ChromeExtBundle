@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Frame</title>
+  <script src="js/jquery/jquery.js"></script>
+  <script src="js/chrome-ext.js"></script>
+  <script>
+      kimaiUrl = 'http://localhost:8001';
+  </script>
+  <style>
+    label {
+      width: 100px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+<!-- Popup opens. -->
+
+<div id="login" style="display: none">
+    <div>You need to login to Kimai to use this extension.</div>
+    <div>Click <button onClick="gotoKimai();">here</button> to open a new tab.</div>
+    <div>Once you are logged in you can close the kimai tab.</div>
+</div>
+
+<div id="openoptions" style="display: none">
+    <div>Your Kimai instance cannot be reached.</div>
+
+    <div>To update the kimai URL right click the extension button and choose options.</div>
+</div>
+
+<div id="log-time">
+        <p id="project">
+          <label for="project">Project</label>
+          <select name="project"></select>
+        </p>
+        <p id="activty">
+          <label for="activity">Activity</label>
+          <select name="activity"></select>
+        </p>
+        <p id="startdate">
+          <label for="start">Start:</label>
+          <input name="start" />
+        </p>
+        <p id="endate">
+          <label for="end">End:</label>
+          <input name="end" />
+        </p>
+        <p id="duration">
+          <label for="duration">Duration:</label>
+          <input name="duration" />
+        </p>
+        <p id="description">
+          <label for="description">Description:</label>
+          <input name="description" />
+        </p>
+        <p id="tags">
+          <label for="tags">Tags:</label>
+          <input name="tags" />
+        </p>
+        <p id="fixed_rate">
+          <label for="fixed_rate">Fixed rate:</label>
+          <input name="fixed_rate" />
+        </p>
+        <p id="hourly_rate">
+          <label for="hourly_rate">Hourly rate:</label>
+          <input name="hourly_rate" />
+        </p>
+</div>
+
+<script>
+    // Check if we can hit kimai, display error if unreachable
+    var action = checkKimaiAvailable();
+    if (action == "goto login") {
+        // Check we can log into kimai, open new tab to log if needed.
+        $("#login").slideDown();
+    }
+    else if (action == "unreachable") {
+        // Check if we can hit kimai, display error if unreachable
+        $("#openoptions").slideDown();
+    }
+    else {
+        // If we are on a github or trello get project and activites.
+        $("#issuecard").show();
+        var path = "/a/b/issues/123";
+        var projAndIssue = parseGitPath(path);
+        var projectName = projAndIssue.project;
+
+        if (projectName != undefined) {
+            var projectId = getProjectId(projectName);
+            // Get a list of activites to use in the log new time box
+            var activites = getActivities(projectId);
+        }
+
+        // Update UI with project name
+        $("#project-name").text(projectName);
+
+        // Fetch and display entries already attached to this issue
+        // var issues = searchByTag(projAndIssue.issue);
+        var issues = [];
+        var html = "<ul>";
+        $.each(issues, function (index, row) { console.log(row); });
+        html += "</ul>";
+        $('#activity-list').html(html);
+    
+    
+        // Display a form for logging new time (project field is needed if can't guess it.)
+        if (projectName != undefined) {
+            // Added hiddden field project
+        }
+        else {
+
+        }
+    }
+</script>
+
+<hr />
+</body>
+</html>
