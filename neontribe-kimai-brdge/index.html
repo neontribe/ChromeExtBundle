@@ -30,45 +30,51 @@
 </div>
 
 <div id="log-time">
-        <p id="project">
+        <p id="project-group">
           <label for="project">Project</label>
-          <select name="project"></select>
+          <select id="project">
+            </select>
         </p>
-        <p id="activty">
+        <p id="activty-group">
           <label for="activity">Activity</label>
           <select name="activity"></select>
         </p>
-        <p id="startdate">
+        <p id="startdate-group">
           <label for="start">Start:</label>
           <input name="start" />
         </p>
-        <p id="endate">
+        <p id="endate-group">
           <label for="end">End:</label>
           <input name="end" />
         </p>
-        <p id="duration">
+        <p id="duration-group">
           <label for="duration">Duration:</label>
           <input name="duration" />
         </p>
-        <p id="description">
+        <p id="description-group">
           <label for="description">Description:</label>
           <input name="description" />
         </p>
-        <p id="tags">
+        <p id="tags-group">
           <label for="tags">Tags:</label>
           <input name="tags" />
         </p>
-        <p id="fixed_rate">
-          <label for="fixed_rate">Fixed rate:</label>
-          <input name="fixed_rate" />
+        <p id="fixed-rate-group">
+          <label for="fixed-rate">Fixed rate:</label>
+          <input name="fixed-rate" />
         </p>
-        <p id="hourly_rate">
-          <label for="hourly_rate">Hourly rate:</label>
-          <input name="hourly_rate" />
+        <p id="hourly-rate-group">
+          <label for="hourly-rate">Hourly rate:</label>
+          <input name="hourly-rate" />
         </p>
 </div>
 
 <script>
+  $( document ).ready(function() {
+    $("#project").on('change', function () {
+      updateActivities()}
+    );
+
     // Check if we can hit kimai, display error if unreachable
     var action = checkKimaiAvailable();
     if (action == "goto login") {
@@ -84,34 +90,22 @@
         $("#issuecard").show();
         var path = "/a/b/issues/123";
         var projAndIssue = parseGitPath(path);
-        var projectName = projAndIssue.project;
 
-        if (projectName != undefined) {
-            var projectId = getProjectId(projectName);
-            // Get a list of activites to use in the log new time box
-            var activites = getActivities(projectId);
-        }
+        var settings = getSettings();
 
-        // Update UI with project name
-        $("#project-name").text(projectName);
+        // Set the project drop down
+        var projects = getProjects();
+        $("#project").find('option').remove();  
+        $.each(projects, function(key, value) {
+          $("#project").append($('<option/>', { 
+                value: value.id,
+                text: value.name 
+            }));
+        });
 
-        // Fetch and display entries already attached to this issue
-        // var issues = searchByTag(projAndIssue.issue);
-        var issues = [];
-        var html = "<ul>";
-        $.each(issues, function (index, row) { console.log(row); });
-        html += "</ul>";
-        $('#activity-list').html(html);
-    
-    
-        // Display a form for logging new time (project field is needed if can't guess it.)
-        if (projectName != undefined) {
-            // Added hiddden field project
-        }
-        else {
 
-        }
     }
+  });
 </script>
 
 <hr />

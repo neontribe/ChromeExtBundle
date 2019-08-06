@@ -1,6 +1,16 @@
 // https://github.com/kevinpapst/kimai2/issues/968
 // https://trello.com/c/Pv2TK7jL/92-tabs-coppermines-cm-73
 
+function getSettings() {
+    var settings = [];
+
+    callApi('/en/neontribe/ext/settings', function(data) {
+        settings = data;
+    }, console.log);
+
+    return settings;
+}
+
 function gotoKimai() {
     window.open(kimaiUrl, '_blank');
 }
@@ -56,6 +66,10 @@ function searchByTag(tag) {
     }, console.log);
 
     return tags;
+}
+
+function updateActivities() {
+    console.log("FOOF");
 }
 
 function guessProject(tags) {

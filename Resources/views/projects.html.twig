@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+{% import "macros/actions.html.twig" as actions %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {# How do I move this to a separate file in a plugin? #}
+    <script>
+        let path = "{{ path('neontribe_ext_project_update', {project: "PROJECT_ID", extid: "EXT_ID"}) }}";
+
+        $(document).ready(function() {
+            $(".save-project").on("click", function () {
+                var extid = $(this).parent().parent().find('input').val();
+                var projectid = $(this).data("projectid");
+                var url = path.replace("PROJECT_ID", projectid).replace("EXT_ID", extid);
+                $.ajax({
+                    url: url,
+                    success: function () {
+                        console.log(data);
+                    },
+                    error: function () {
+                        console.log(data);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block main %}
+{% for customerName, customer in customers %}
+    <div>
+        <ul>
+            <li class='customername'>
+                <a href="#" onclick="$(this).parent().find('table').toggle();">{{ customerName }}</a>
+                <table style="display: none">
+                    <tr><th>Kimai Project</th><th>External ID</th></tr>
+                    {% for project in projects[customerName] %}
+                        <tr class='project'>
+                            <td>{{ project.name }}</td>
+                            <td><input type="text"/></td>
+                            <td>
+                                <a href="#" class="save-project" data-projectid="{{ project.id }}">
+                                    <i class="far fa-save"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </li>
+        </ul>
+    </div>
+{% endfor %}
+
+{% endblock %}
