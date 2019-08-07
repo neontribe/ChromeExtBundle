@@ -16,7 +16,7 @@ function gotoKimai() {
 }
 
 function callApi(path, fnSuccess, fnError) {
-    // var kimaiUrl = 'http://localhost:8001';
+    // var kimaiUrl = 'http://localhost';
     var url = kimaiUrl + path;
 
     $.ajax({
@@ -68,8 +68,17 @@ function searchByTag(tag) {
     return tags;
 }
 
-function updateActivities() {
-    console.log("FOOF");
+function updateActivities(projectId) {
+    var activities = getActivities(projectId);
+
+    $("#activity").find('option').remove();  
+    $.each(activities, function(key, value) {
+        if (value.id == 1) console.log(value);
+        $("#activity").append($('<option/>', { 
+            value: value.id,
+            text: value.name 
+        }));
+    });
 }
 
 function guessProject(tags) {
