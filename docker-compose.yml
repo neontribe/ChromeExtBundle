@@ -20,10 +20,9 @@ services:
         - APP_ENV=dev
         - DATABASE_URL=mysql://kimaiu:kimaip@mydb/kimai
         - ADMINMAIL=kimai@example.com
-        - ADMINPASS=pass123
+        - ADMINPASS=password123
     volumes:
         - .:/opt/kimai/var/plugins/ChromeExtBundle
-        - /home/tobias/workspace/kimai/ChromeExtBundle/neontribe-kimai-brdge:/opt/kimai/public/ntkb
     depends_on:
         - mydb
     ports:

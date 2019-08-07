@@ -3,12 +3,7 @@ namespace KimaiPlugin\ChromeExtBundle\Controller;
 
 // use App\Controller\AbstractController;
 use App\Entity\Project;
-use App\Entity\Timesheet;
-use App\Form\TimesheetEditForm;
-use App\Timesheet\CalculatorInterface;
-use KimaiPlugin\ChromeExtBundle\Entity\ExtIssue;
-use KimaiPlugin\ChromeExtBundle\Entity\ExtProject;
-use KimaiPlugin\ChromeExtBundle\Form\ExtProjectType;
+use App\Entity\ProjectMeta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -70,25 +65,42 @@ class ChromeExtController extends AbstractController
                 $_projects[$customerName] = [];
             }
             $_projects[$customerName][] = $project;
+            if ($project->getId() == 1) dump($project);
         }
 
         return $this->render('@ChromeExt/projects.html.twig', [
             'customers' => $_customers,
-            'projects' => $_projects
+            'projects' => $_projects,
+            'path' => $url = $this->generateUrl(
+                'neontribe_ext_project_update',
+                 [
+                    'project' => 'PROJECT_ID',
+                    'extid' => 'EXT_ID',
+                     ]
+                 ),
         ]);
     }
 
     /**
      * Returns a list of projects.
      *
-     * @Route(path="/project/{id}/update", name="neontribe_ext_project_update", methods="POST")
+     * , methods="POST")
+     * 
+     * @Route(path="/project/{project}/update", name="neontribe_ext_project_update")
      * @Security("is_granted('create_own_timesheet')")
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function projectUpdateAction(Request $request, Project project)
+    public function projectUpdateAction(Request $request, Project $project)
     {
+        $value = $request->query->get("extid");
+        if ($value != null) {
+            $externalId = (new ProjectMeta())->setName('externalID')->setValue($value);
+            $project->setMetaField($externalId);
+            $this->getDoctrine()->getManager()->persist($project);
+            $this->getDoctrine()->getManager()->flush();
+        }
         return $this->projectAction($request);
     }
 }
