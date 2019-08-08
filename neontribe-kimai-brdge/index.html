@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Frame</title>
+  <script src="js/jquery/jquery.js"></script>
+  <script src="js/chrome-ext.js"></script>
+  <script>
+      kimaiUrl = 'http://localhost:8001';
+  </script>
+  <style>
+    label {
+      width: 100px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+<!-- Popup opens. -->
+
+<div id="login" style="display: none">
+    <div>You need to login to Kimai to use this extension.</div>
+    <div>Click <button onClick="gotoKimai();">here</button> to open a new tab.</div>
+    <div>Once you are logged in you can close the kimai tab.</div>
+</div>
+
+<div id="openoptions" style="display: none">
+    <div>Your Kimai instance cannot be reached.</div>
+
+    <div>To update the kimai URL right click the extension button and choose options.</div>
+</div>
+
+<div id='feedback'>
+
+</div>
+
+<div id="log-time">
+        <p id="project-group">
+          <label for="project">Project</label>
+          <select id="project" name="project">
+            </select>
+        </p>
+        <p id="activty-group">
+          <label for="activity">Activity</label>
+          <select id="activity" name="activity"></select>
+        </p>
+        <p id="startdate-group">
+          <label for="start">Start:</label>
+          <input name="start" />
+        </p>
+        <p id="endate-group">
+          <label for="end">End:</label>
+          <input name="end" />
+        </p>
+        <p id="duration-group">
+          <label for="duration">Duration:</label>
+          <input name="duration" />
+        </p>
+        <p id="description-group">
+          <label for="description">Description:</label>
+          <input name="description" />
+        </p>
+        <p id="tags-group">
+          <label for="tags">Tags:</label>
+          <input name="tags" />
+        </p>
+        <p id="fixed-rate-group">
+          <label for="fixed-rate">Fixed rate:</label>
+          <input name="fixed-rate" />
+        </p>
+        <p id="hourly-rate-group">
+          <label for="hourly-rate">Hourly rate:</label>
+          <input name="hourly-rate" />
+        </p>
+</div>
+
+<script>
+  $( document ).ready(function() {
+    $("#project").on('change', function () {
+      updateActivities($(this).val())}
+    );
+
+    // Check if we can hit kimai, display error if unreachable
+    var action = checkKimaiAvailable();
+    if (action == "goto login") {
+        // Check we can log into kimai, open new tab to log if needed.
+        $("#login").slideDown();
+    }
+    else if (action == "unreachable") {
+        // Check if we can hit kimai, display error if unreachable
+        $("#openoptions").slideDown();
+    }
+    else {
+        // If we are on a github or trello get project and activites.
+        $("#issuecard").show();
+        // var path = "/someorg/someproject/issues/123";
+        // var path = "/c/Z6iWmfJK/79-tabs2";
+        // var projAndIssue = parseGitPath(path);
+        // var projAndIssue = parseTrelloPath(path);
+        var projAndIssue = {
+          issue: "issue123",
+          project: "ext project id",
+        };
+
+        var settings = getSettings();
+
+        // Set the project drop down
+        var projects = getProjects();
+        $("#project").find('option').remove();  
+        $.each(projects, function(key, value) {
+          if (value.id == 1) console.log(value);
+
+          // if (value.metaFields.externalId == projAndIssue.project) // set as selected
+
+          $("#project").append($('<option/>', { 
+                value: value.id,
+                text: value.name 
+            }));
+        });
+        updateActivities($("#project").val());
+
+
+    }
+  });
+</script>
+
+<hr />
+</body>
+</html>

@@ -5,13 +5,13 @@
   "homepage_url": "https://www.neontribe.co.uk",
   "version": "0.0.1",
   "background": {
-    "scripts": ["event.js"],
+    "scripts": ["js/event.js"],
     "persistent": false
   },
-  "options_page": "options.html",
+  "options_page": "html/options.html",
   "browser_action": {
-    "default_icon": "icon.png",
-    "default_popup": "popup.html"
+    "default_icon": "images/icon.png",
+    "default_popup": "html/popup.html"
   },
   "permissions": [
     "tabs", 
