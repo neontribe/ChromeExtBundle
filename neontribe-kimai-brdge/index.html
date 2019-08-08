@@ -50,31 +50,34 @@
         </p>
         <p id="startdate-group">
           <label for="start">Start:</label>
-          <input name="start" />
+          <input id="start" name="start" />
         </p>
         <p id="endate-group">
           <label for="end">End:</label>
-          <input name="end" />
+          <input id="end" name="end" />
         </p>
         <p id="duration-group">
           <label for="duration">Duration:</label>
-          <input name="duration" />
+          <input id="duration" name="duration" />
         </p>
         <p id="description-group">
           <label for="description">Description:</label>
-          <input name="description" />
+          <input id="description" name="description" />
         </p>
         <p id="tags-group">
           <label for="tags">Tags:</label>
-          <input name="tags" />
+          <input id="tags" name="tags" />
         </p>
         <p id="fixed-rate-group">
           <label for="fixed-rate">Fixed rate:</label>
-          <input name="fixed-rate" />
+          <input id="fixed-rate" name="fixed-rate" />
         </p>
         <p id="hourly-rate-group">
           <label for="hourly-rate">Hourly rate:</label>
-          <input name="hourly-rate" />
+          <input id="hourly-rate" name="hourly-rate" />
+        </p>
+        <p>
+          <input type="button" id="submit" name="submit" value="submit" />
         </p>
 </div>
 
@@ -83,6 +86,32 @@
     $("#project").on('change', function () {
       updateActivities($(this).val())}
     );
+
+    $('#submit').on("click", function(){
+      $.ajax({
+          url: kimaiUrl + '/api/timesheets',
+          data: {
+            "begin": "2019-08-08T13:08:46",
+            "end": "2019-08-08T13:08:46",
+            "project": $("#project").val(),
+            "activity": $("#activity").val(),
+            "description": "The text description",
+            "tags": "projectId,IssueId",
+            "fixedRate": 0,
+            "hourlyRate": 0
+          },
+          type: 'POST',
+          beforeSend: function (request) {
+              request.setRequestHeader("X-AUTH-SESSION", "THING-1");
+          },
+          headers: {
+              'X-AUTH-SESSION': "THING-1",
+          },
+          success: console.log,
+          error: console.log,
+          async: false
+      });
+    });
 
     // Check if we can hit kimai, display error if unreachable
     var action = checkKimaiAvailable();
