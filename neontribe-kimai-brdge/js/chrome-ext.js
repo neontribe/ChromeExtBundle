@@ -175,7 +175,6 @@ function getTimesheets(uuid) {
 
 function getActivityName(activityId) {
     var name = "Unknown!";
-    console.log(activityId);
 
     callApi('/api/activities/' + activityId, function(data) {
         name = data.name;
