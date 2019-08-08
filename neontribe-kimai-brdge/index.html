@@ -33,6 +33,11 @@
 
 </div>
 
+<div>
+  <ul id='timesheets'>
+  </ul>
+</div>
+
 <div id="log-time">
         <p id="project-group">
           <label for="project">Project</label>
@@ -97,8 +102,8 @@
         // var projAndIssue = parseGitPath(path);
         // var projAndIssue = parseTrelloPath(path);
         var projAndIssue = {
-          issue: "issue123",
-          project: "ext project id",
+          issue: "someproject-issues-123",
+          project: "someproject",
         };
 
         var settings = getSettings();
@@ -118,7 +123,15 @@
         });
         updateActivities($("#project").val());
 
-
+        var timesheets = getTimesheets(projAndIssue.issue);
+        $("#timesheets").find('option').remove();  
+        $.each(timesheets, function (key, value){
+          // var msg = value.date + " " + value.desc + " " + value.who + " " + value.duration;
+          var msg = `${value.begin} ${getActivityName($("#project").val(), value.activity)} ${value.duration} minutes`;
+          $("#timesheets").append(
+            "<li><a href='kimai timesheet url'>" + msg + "</a></li>"
+          );
+        });
     }
   });
 </script>

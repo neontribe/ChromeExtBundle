@@ -160,3 +160,26 @@ function checkKimaiAvailable() {
 
     return action;
 }
+
+function getTimesheets(uuid) {
+    // curl -X GET "http://localhost/api/timesheets?tags=qwerty" -H  "accept: application/json"
+    
+    var timesheets = [];
+
+    callApi('/api/timesheets?tags=' + uuid, function(data) {
+        timesheets = data;
+    }, console.log);
+
+    return timesheets;
+}
+
+function getActivityName(activityId) {
+    var name = "Unknown!";
+    console.log(activityId);
+
+    callApi('/api/activities/' + activityId, function(data) {
+        name = data.name;
+    }, console.log);
+
+    return name;
+}
