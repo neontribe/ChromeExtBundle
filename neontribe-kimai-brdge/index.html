@@ -5,7 +5,7 @@
   <script src="js/jquery/jquery.js"></script>
   <script src="js/chrome-ext.js"></script>
   <script>
-      kimaiUrl = 'http://localhost';
+      kimaiUrl = 'http://localhost:8001';
   </script>
   <style>
     label {
@@ -36,12 +36,12 @@
 <div id="log-time">
         <p id="project-group">
           <label for="project">Project</label>
-          <select id="project">
+          <select id="project" name="project">
             </select>
         </p>
         <p id="activty-group">
           <label for="activity">Activity</label>
-          <select name="activity"></select>
+          <select id="activity" name="activity"></select>
         </p>
         <p id="startdate-group">
           <label for="start">Start:</label>
@@ -76,7 +76,7 @@
 <script>
   $( document ).ready(function() {
     $("#project").on('change', function () {
-      updateActivities()}
+      updateActivities($(this).val())}
     );
 
     // Check if we can hit kimai, display error if unreachable
