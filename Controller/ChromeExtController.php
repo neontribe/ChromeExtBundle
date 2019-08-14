@@ -1,10 +1,12 @@
 <?php
 namespace KimaiPlugin\ChromeExtBundle\Controller;
 
-// use App\Controller\AbstractController;
+use App\Controller\AbstractController;
+use KimaiPlugin\ChromeExtBundle\Repository\ChromeExtRepository;
 use App\Entity\Project;
 use App\Entity\ProjectMeta;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -17,6 +19,19 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class ChromeExtController extends AbstractController
 {
+
+    /**
+     * @var ChromeExtRepository
+     */
+    protected $repository;
+    /**
+     * @param ChromeExtRepository $repository
+     */
+    public function __construct(ChromeExtRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+
     /**
      * Returns a list of settings.
      *
@@ -26,7 +41,7 @@ class ChromeExtController extends AbstractController
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request)
+    public function settingsAction(Request $request)
     {
         $settings = [
             'duration_only' => true,
@@ -37,6 +52,39 @@ class ChromeExtController extends AbstractController
 
         $response = new JsonResponse($settings);
         return $response;
+    }
+
+    /**
+     * Show and update a list of settings.
+     *
+     * @Route(path="/config", name="neontribe_ext_config")
+     * @Security("is_granted('create_own_timesheet')")
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function configAction(Request $request)
+    {
+        $settings = $this->repository->getConfig();
+
+        $form = $this->createFormBuilder($settings)
+            ->add('durationOnly', CheckboxType::class, ['required' => false])
+            ->add('showTags', CheckboxType::class, ['required' => false])
+            ->add('showFixedRate', CheckboxType::class, ['required' => false])
+            ->add('showHourlyRate', CheckboxType::class, ['required' => false])
+            ->add('save', SubmitType::class, ['label' => 'Save'])
+            ->getForm();
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $settings = $form->getData();
+            $this->repository->saveConfig($settings);
+            return $this->redirectToRoute('neontribe_ext_config');
+        }
+
+        return $this->render('@ChromeExt/settings.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
     /**
