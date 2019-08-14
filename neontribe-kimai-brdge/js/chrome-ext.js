@@ -34,6 +34,19 @@ function callApi(path, fnSuccess, fnError) {
     });
 }
 
+function parseUrl(url) {
+    var a = $('<a>', {
+        href: url
+    });
+    if (a.prop('hostname') == 'github.com') {
+        return parseGitPath(a.prop('pathname'));
+    } else if (a.prop('hostname') == 'trello.com') {
+        return parseTrelloPath(a.prop('pathname'));
+    }
+
+    return false;
+}
+
 function parseGitPath(path) {
     var parts = path.split("/");
     if (parts.length < 5 || parts[3] !== 'issues') {
@@ -56,16 +69,6 @@ function parseTrelloPath(path) {
         'project': parts[2],
         'issue': parts.slice(2).join('-')
     }
-}
-
-function searchByTag(tag) {
-    var tags = [];
-
-    callApi('/api/timesheets?tags=' + tag, function(data) {
-        tags = data;
-    }, console.log);
-
-    return tags;
 }
 
 function updateActivities(projectId) {
@@ -165,17 +168,23 @@ function getTimesheets(uuid) {
     // curl -X GET "http://localhost/api/timesheets?tags=qwerty" -H  "accept: application/json"
     
     var timesheets = [];
+    var tags = [];
 
-    callApi('/api/timesheets?tags=' + uuid, function(data) {
-        timesheets = data;
+    callApi('/api/tags', function(data) {
+        tags = data;
     }, console.log);
+
+    if ($.inArray(uuid, tags) !== -1) {
+        callApi('/api/timesheets?user=all&tags=' + uuid, function (data) {
+            timesheets = data;
+        }, console.log);
+    }
 
     return timesheets;
 }
 
 function getActivityName(activityId) {
     var name = "Unknown!";
-    console.log(activityId);
 
     callApi('/api/activities/' + activityId, function(data) {
         name = data.name;

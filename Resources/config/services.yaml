@@ -3,6 +3,8 @@ services:
         autowire: true
         autoconfigure: true
         public: false
+        bind:
+            $dataDirectory: "%kimai.data_dir%"
 
     KimaiPlugin\ChromeExtBundle\:
         resource: '../../*'
