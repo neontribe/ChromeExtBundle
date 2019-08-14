@@ -174,7 +174,7 @@ function getTimesheets(uuid) {
         tags = data;
     }, console.log);
 
-    if ($.inArray(uuid, tags)) {
+    if ($.inArray(uuid, tags) !== -1) {
         callApi('/api/timesheets?user=all&tags=' + uuid, function (data) {
             timesheets = data;
         }, console.log);

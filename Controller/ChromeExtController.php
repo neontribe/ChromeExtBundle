@@ -43,14 +43,9 @@ class ChromeExtController extends AbstractController
      */
     public function settingsAction(Request $request)
     {
-        $settings = [
-            'duration_only' => true,
-            'show_tags' => true,
-            'fixed_rate' => false,
-            'hourl_yrate' => false,
-        ];
+        $settings = $this->repository->getConfig();
 
-        $response = new JsonResponse($settings);
+        $response = new JsonResponse($this->repository::toArray($settings));
         return $response;
     }
 

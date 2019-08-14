@@ -133,6 +133,30 @@
     });
 
     function init(url) {
+        var settings = getSettings();
+        if (settings.durationOnly) {
+            // Hide end time, show duration
+            $("#endate-group").hide();
+            $("#duration-group").show();
+        }
+        else {
+            // Show end time, hide duration
+            $("#endate-group").show();
+            $("#duration-group").hide();
+        }
+
+        if (!settings.showTags) {
+            $("#tags-group").hide();
+        }
+
+        if (!settings.showFixedRate) {
+            $("#fixed-rate-group").hide();
+        }
+
+        if (!settings.showHourlyRate) {
+            $("#hourly-rate-group").hide();
+        }
+
         // Check if we can hit kimai, display error if unreachable
         var action = checkKimaiAvailable();
         if (action == "goto login") {
@@ -148,9 +172,7 @@
             if (!projAndIssue) {
                 return;
             }
-            console.log(projAndIssue);
 
-            var settings = getSettings();
 
             // Set the project drop down
             var projects = getProjects();

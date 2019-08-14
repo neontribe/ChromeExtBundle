@@ -31,7 +31,7 @@ class ChromeExtRepository
         if (file_exists($this->settingsFile) && !is_writable($this->settingsFile)) {
             throw new \Exception('Settings file is not writable: ' . $this->settingsFile);
         }
-        if (false === file_put_contents($this->settingsFile, $this->toJson($settings))) {
+        if (false === file_put_contents($this->settingsFile, self::toJson($settings))) {
             throw new \Exception('Failed saving custom css rules to file: ' . $this->settingsFile);
         }
         return true;
@@ -43,7 +43,7 @@ class ChromeExtRepository
     {
         $entity = new ChromeExtSetting();
         if (file_exists($this->settingsFile) && is_readable($this->settingsFile)) {
-            $entity = $this->fromJson(file_get_contents($this->settingsFile));
+            $entity = self::fromJson(file_get_contents($this->settingsFile));
         }
         return $entity;
     }
@@ -52,7 +52,7 @@ class ChromeExtRepository
      * @param string $json
      * @return ChromeExtSetting
      */
-    public function fromJson(string $json) {
+    public static function fromJson(string $json) {
         $data = json_decode($json, true);
         $entity = new ChromeExtSetting();
 
@@ -79,14 +79,22 @@ class ChromeExtRepository
      * @param ChromeExtSetting $settings
      * @return false|string
      */
-    public function toJson(ChromeExtSetting $settings) {
+    public static function toJson(ChromeExtSetting $settings) {
+        return json_encode(self::toArray($settings), JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @param ChromeExtSetting $settings
+     * @return false|string
+     */
+    public static function toArray(ChromeExtSetting $settings) {
         $data = [
             'durationOnly' => $settings->isDurationOnly(),
             'showTags' => $settings->isShowTags(),
             'showFixedRate' => $settings->isShowFixedRate(),
             'showHourlyRate' => $settings->isShowHourlyRate(),
         ];
-        return json_encode($data, JSON_PRETTY_PRINT);
+        return $data;
     }
 
 }
