@@ -84,17 +84,6 @@ function updateActivities(projectId) {
     });
 }
 
-function guessProject(tags) {
-    // TODO Loop through tags and find the mode project
-    // For now just return the last used
-    if (tags.length > 0) {
-        tag = tags.pop();
-        return tag.project;
-    }
-
-    return false;
-}
-
 function getProjects() {
     var projects = [];
 

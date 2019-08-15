@@ -22,8 +22,8 @@
 <!-- DEBUG. -->
 <div id='data'>
     <select id="url" name="url">
+      <option>https://trello.com/c/txp6heU1/89-badge-cm-70</option>
         <option>https://github.com/someorg/someproject/issues/123</option>
-        <option>https://trello.com/c/txp6heU1/89-badge-cm-70</option>
     </select>
     <button name="Update" id="update">Update</button>
 </div>
@@ -199,9 +199,6 @@
             var projects = getProjects();
             $("#project").find('option').remove();
             $.each(projects, function (key, value) {
-              
-                // if (value.metaFields.externalId == projAndIssue.project) // set as selected
-
                 $("#project").append($('<option/>', {
                     value: value.id,
                     text: value.name
@@ -210,6 +207,7 @@
             updateActivities($("#project").val());
 
             var timesheets = getTimesheets(projAndIssue.issue);
+            var projectId = false;
             $("#timesheets").find('option').remove();
             $.each(timesheets, function (key, value) {
                 // var msg = value.date + " " + value.desc + " " + value.who + " " + value.duration;
@@ -217,7 +215,17 @@
                 $("#timesheets").append(
                     "<li><a href='kimai timesheet url'>" + msg + "</a></li>"
                 );
+                // Also set the current project if not set already
+                if (!projectId) {
+                  projectId = value.project;
+                }
             });
+
+            // If we have at least one timesheet the project will exist and we can set it.
+            if (projectId) {
+              $("#project option[value='" + projectId + "']").prop('selected', true);
+              $("#project-group").hide();
+            }
         }
     }
 
