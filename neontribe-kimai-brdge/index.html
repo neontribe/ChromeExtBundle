@@ -5,6 +5,7 @@
     <meta content="utf-8" http-equiv="encoding">
   <title>Test Frame</title>
   <script src="js/jquery/jquery.js"></script>
+  <script src="node_modules/moment/moment.js"></script>
   <script src="js/chrome-ext.js"></script>
   <script>
       kimaiUrl = 'http://localhost:8001';
@@ -69,8 +70,8 @@
           <input id="end" type="date" name="end" />
         </p>
         <p id="duration-group">
-          <label for="duration">Duration (hours:minutes):</label>
-          <input id="duration" type="time" name="duration" />
+          <label for="duration">Duration (minutes):</label>
+          <input id="duration" type="number" name="duration" />
         </p>
         <p id="description-group">
           <label for="description">Description:</label>
@@ -95,6 +96,8 @@
 
 <script>
   $( document ).ready(function() {
+    var projAndIssue;
+    var settings;
 
       // DEBUG STUFF
       $('#update').on('change', function () {
@@ -107,18 +110,35 @@
     );
 
     $('#submit').on("click", function(){
+      var start = new Date($("#start").val());
+      var end = new Date($("#end").val());
+      var project = $("#project").val();
+      var activity = $("#activity").val();
+      var description = $("#description").val();
+      var tags = $("#tags").val();
+      var fixedrate = $("#fixed-rate").val();
+      var hourlyrate = $("#hourly-rate").val();
+      var duration = $('#duration').val();
+      
+      if (duration > 0) {
+        end = moment(start).add(duration, 'm').toDate();
+      }
+      tags = tags + projAndIssue.project + ',' + projAndIssue.issue;
+
+      data = {
+        "begin": start.toISOString(),
+        "end": end.toISOString(),
+        "project": project,
+        "activity": activity,
+        "description": description,
+        "tags": tags,
+        "fixedRate": fixedrate,
+        "hourlyRate": hourlyrate,
+      };
+
       $.ajax({
           url: kimaiUrl + '/api/timesheets',
-          data: {
-            "begin": "2019-08-08T13:08:46",
-            "end": "2019-08-08T13:08:46",
-            "project": $("#project").val(),
-            "activity": $("#activity").val(),
-            "description": "The text description",
-            "tags": "projectId,IssueId",
-            "fixedRate": 0,
-            "hourlyRate": 0
-          },
+          data: data,
           type: 'POST',
           beforeSend: function (request) {
               request.setRequestHeader("X-AUTH-SESSION", "THING-1");
@@ -126,14 +146,16 @@
           headers: {
               'X-AUTH-SESSION': "THING-1",
           },
-          success: console.log,
+          success: function (data) {
+            console.log(data);
+          },
           error: console.log,
           async: false
       });
     });
 
     function init(url) {
-        var settings = getSettings();
+        settings = getSettings();
         if (settings.durationOnly) {
             // Hide end time, show duration
             $("#endate-group").hide();
@@ -168,18 +190,16 @@
         } else {
             // If we are on a github or trello get project and activites.
             $("#issuecard").show();
-            var projAndIssue = parseUrl(url);
+            projAndIssue = parseUrl(url);
             if (!projAndIssue) {
                 return;
             }
-
 
             // Set the project drop down
             var projects = getProjects();
             $("#project").find('option').remove();
             $.each(projects, function (key, value) {
-                if (value.id == 1) console.log(value);
-
+              
                 // if (value.metaFields.externalId == projAndIssue.project) // set as selected
 
                 $("#project").append($('<option/>', {
@@ -193,7 +213,7 @@
             $("#timesheets").find('option').remove();
             $.each(timesheets, function (key, value) {
                 // var msg = value.date + " " + value.desc + " " + value.who + " " + value.duration;
-                var msg = `${value.begin} ${getActivityName($("#project").val(), value.activity)} ${value.duration} minutes`;
+                var msg = `${value.begin} ${getActivityName($("#project").val(), value.activity)} ${value.duration / 60} minutes`;
                 $("#timesheets").append(
                     "<li><a href='kimai timesheet url'>" + msg + "</a></li>"
                 );
